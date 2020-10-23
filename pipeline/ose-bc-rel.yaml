@@ -1,0 +1,23 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "pipeline-release"
+spec:
+  source:
+    git:
+      ref: release
+      uri: 'https://github.com/sankamath/sample-go-app'
+    sourceSecret:
+      name: cicd-cred
+    type: Git
+  strategy:
+    jenkinsPipelineStrategy:
+      env:
+        - name: GIT_SSL_NO_VERIFY
+          value: 'true'
+      jenkinsfilePath: pipeline/Jenkinsfile
+    type: JenkinsPipeline
+  triggers:
+    - github:
+        secret: cicd-cred
+      type: GitHub

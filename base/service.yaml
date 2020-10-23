@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sample-go-app
+  name: sample-go-app
+spec:
+  ports:
+    - name: go-web
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: sample-go-app
+  sessionAffinity: None
+  type: ClusterIP

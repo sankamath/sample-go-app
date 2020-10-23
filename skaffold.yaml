@@ -1,0 +1,23 @@
+apiVersion: skaffold/v2beta7
+kind: Config
+metadata:
+  name: sample-go-app
+# build: &default-build
+#   artifacts:
+#   - image: sample-go-app:v5
+#     context: app
+deploy:
+  kustomize:
+    paths:
+    - overlays/st
+profiles:
+- name: dev
+  deploy:
+    kustomize:
+      paths:
+      - overlays/st
+- name: staging
+  deploy:
+    kustomize:
+      paths:
+      - overlays/staging

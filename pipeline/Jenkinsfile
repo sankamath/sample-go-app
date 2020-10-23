@@ -1,0 +1,110 @@
+pipeline {
+    agent {
+      node {
+        // spin up a cat custom slave pod to run this build on
+       label 'jenkins-agent-kustomize'
+      }
+    }
+    /* options {
+        // set a timeout of 20 minutes for this pipeline
+        //timeout(time: 20, unit: 'MINUTES')
+    } */
+
+                    environment {
+                        BUILD_NAME = 'sample-go-app'
+                        BUILD_NAMESPACE = 'build'
+                        CI_NAMESPACE = 'cicd'
+                        GIT_BRANCH = sh(returnStdout: true, script: 'git ls-remote --heads origin | grep $(git rev-parse HEAD) | cut -d / -f 3').trim()
+                        GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                        RELEASE='1.0.0'
+                        ST_NAMESPACE = 'st'
+                        IMAGE_NAME = 'sample-go-app'
+                        
+                        JENKINS_SA = 'jenkins'
+                        JENKINS_SA_TOKEN = sh(returnStdout: true, script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token').trim()
+                
+                    }
+                    stages {
+                        stage('preamble') {
+                            steps {
+                                //sh''' sleep infinity '''
+                                script {
+                                    openshift.withCluster() {
+                                        openshift.withProject() {
+                                            //shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                                            
+                                            echo "Using project: ${openshift.project()}"
+                                            echo "currently running from " + GIT_BRANCH +  " branch"
+                                            echo "jenkins build number is ${BUILD_NUMBER}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+        
+        stage('Create Image Builder') {
+            when {
+                expression {
+                    openshift.withCluster() {
+                    openshift.withProject(BUILD_NAMESPACE) {
+                        return !openshift.selector("bc", "${BUILD_NAME}").exists();
+                        }
+                    }
+                }
+            }
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(BUILD_NAMESPACE) {
+                            openshift.newBuild("--name=${BUILD_NAME}", "--binary=true")
+                        }
+                    }
+                }//script
+            }//steps
+        } // stage
+
+        stage('Build Application Docker Image') {
+            steps {
+                script {
+                        openshift.withCluster() {
+                        openshift.withProject(env.BUILD_NAMESPACE) {
+                         //patch BC image with new tag
+                        def bc = openshift.selector('bc', BUILD_NAME).object()
+                        print bc.spec.output.to.name
+                        bc.spec.output.to.name = BUILD_NAME + ':' + RELEASE + "-" + GIT_COMMIT + "-" + BUILD_NUMBER
+                        print bc.spec.output.to.name
+                        openshift.apply(bc)
+                        openshift.selector("bc", "$BUILD_NAME").startBuild("--from-file=./base/", "--wait=true", "--follow" )
+                        }
+                    }
+
+                }//script
+            }//steps
+        }//stage
+        stage('deploy to ST') {
+         steps {
+            sh '''#!/bin/bash
+              kustomize build | oc apply -f- -n st
+            '''
+            } // steps
+         }//stage
+    }//stages
+    post {
+        always {
+            echo 'Build and deployment of FRIG AUTH application has completed'
+        }
+        success {
+            echo 'Build was successful'
+        }
+        failure {
+            echo 'Build has failed'
+        }
+        unstable {
+            echo 'There was some issue with the build, please verify the logs'
+        }
+        changed {
+            echo 'Commit message has proven to pass this build'
+
+        }
+    }
+} // pipeline

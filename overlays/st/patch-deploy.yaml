@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sample-go-app
+spec:
+  template:
+    spec:    
+      containers:
+        - name: sample-go-app
+          image: "sample-go-app:v1"

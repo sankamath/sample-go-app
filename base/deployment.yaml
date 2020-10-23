@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: sample-go-app
+    env: st
+    release: 1.0.0
+  name: sample-go-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-go-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: sample-go-app
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+      containers:
+      - name: sample-go-app
+        image: image
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /isAlive
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        ports:
+          - containerPort: 3000
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /imReady
+            scheme: HTTP
+            port: 3000
+          periodSeconds: 10
+          timeoutSeconds: 1
+        resources:
+            requests:
+              cpu: '200m'
+              memory: 256Mi
+            limits:
+              cpu: '500m'
+              memory: 512Mi
+        volumeMounts:
+          - mountPath: /mnt/app.properties
+            name: config
+            subPath: app.properties
+            readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: app-config
+            defaultMode: 0550
+
