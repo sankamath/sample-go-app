@@ -17,9 +17,9 @@ pipeline {
                         GIT_BRANCH = sh(returnStdout: true, script: 'git ls-remote --heads origin | grep $(git rev-parse HEAD) | cut -d / -f 3').trim()
                         GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
                         RELEASE='1.0.0'
-                        ST_NAMESPACE = 'st'
+                        IMAGE_TAG="${RELEASE}-${GIT_BRANCH}-${GIT_COMMIT}"
+                        DEV_NAMESPACE = 'dev'
                         IMAGE_NAME = 'sample-go-app'
-                        
                         JENKINS_SA = 'jenkins'
                         JENKINS_SA_TOKEN = sh(returnStdout: true, script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token').trim()
                 
@@ -27,16 +27,7 @@ pipeline {
                     stages {
                         stage('preamble') {
                             steps {
-                                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'cicd-github', passwordVariable: 'GITHUB_TOKEN']]) {
-                                // available as an env variable, but will be masked if you try to print it out any which way
-                                // note: single quotes prevent Groovy interpolation; expansion is by Bourne Shell, which is what you want
-                                sh 'ls -ltr '
-                                sh 'echo $GITHUB_TOKEN'
-                                // also available as a Groovy variable
-                                echo GITHUB_TOKEN
-                                // or inside double quotes for string interpolation
-                                echo "token is $GITHUB_TOKEN"
-                                }
+                                
 
                                 script {
                                     openshift.withCluster() {
@@ -78,30 +69,35 @@ pipeline {
                 script {
                         openshift.withCluster() {
                         openshift.withProject(env.BUILD_NAMESPACE) {
-                         //patch BC image with new tag
                         def bc = openshift.selector('bc', BUILD_NAME).object()
                         print bc.spec.output.to.name
                         bc.spec.output.to.name = BUILD_NAME + ':' + RELEASE + "-" + GIT_COMMIT + "-" + BUILD_NUMBER
                         print bc.spec.output.to.name
                         openshift.apply(bc)
-                        openshift.selector("bc", "$BUILD_NAME").startBuild("--from-file=./base/", "--wait=true", "--follow" )
+                        openshift.selector("bc", "$BUILD_NAME").startBuild("--from-file=./base/", "--wait=true" )
                         }
                     }
 
                 }//script
             }//steps
         }//stage
+        stage('Scan and tag develop') {
+         steps {
+            openshift.tag("${env.CI_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+            } // steps
+         }//stage
         stage('deploy to ST') {
          steps {
             sh '''#!/bin/bash
-              kustomize build | oc apply -f- -n st
+            kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
+              kustomize build | oc apply -f- -n dev
             '''
             } // steps
          }//stage
     }//stages
     post {
         always {
-            echo 'Build and deployment of FRIG AUTH application has completed'
+            echo 'Build and deployment of sample go application has completed'
         }
         success {
             echo 'Build was successful'
