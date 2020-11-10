@@ -10,7 +10,7 @@ spec:
       ref: develop
       uri: 'https://github.com/sankamath/sample-go-app'
     sourceSecret:
-      name: cicd-cred
+      name: github
     type: Git
   strategy:
     jenkinsPipelineStrategy:
@@ -21,5 +21,5 @@ spec:
     type: JenkinsPipeline
   triggers:
     - github:
-        secret: cicd-cred
+        secret: github
       type: GitHub
