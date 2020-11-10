@@ -30,6 +30,7 @@ pipeline {
                                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'cicd-github', passwordVariable: 'GITHUB_TOKEN']]) {
                                 // available as an env variable, but will be masked if you try to print it out any which way
                                 // note: single quotes prevent Groovy interpolation; expansion is by Bourne Shell, which is what you want
+                                sh 'ls -ltr '
                                 sh 'echo $GITHUB_TOKEN'
                                 // also available as a Groovy variable
                                 echo GITHUB_TOKEN
