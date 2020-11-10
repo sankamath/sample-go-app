@@ -1,0 +1,14 @@
+apiVersion: v1
+groupNames: null
+kind: RoleBinding
+metadata:
+  name: jenkins-rbac-build
+  namespace: build
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: jenkins
+  namespace: cicd
