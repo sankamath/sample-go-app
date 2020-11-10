@@ -6,7 +6,7 @@ resources:
 
 commonLabels:
   app: sample-go-app
-  env: st
+  env: dev
   release: 1.0.0
 
 #nameSuffix: -st
@@ -24,7 +24,7 @@ patches:
 - patch: |-
     - op: replace
       path: /spec/host
-      value: sample-go-app-st.apps.test
+      value: sample-go-app-dev.apps-crc.testing
     - op: replace
       path: /spec/to/name
       value: sample-go-app
