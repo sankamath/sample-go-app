@@ -57,7 +57,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject(BUILD_NAMESPACE) {
-                            openshift.newBuild("--name=${BUILD_NAME}", "--binary=true")
+                            openshift.newApp("./pipeline/cicd-template.yaml")
                         }
                     }
                 }//script
