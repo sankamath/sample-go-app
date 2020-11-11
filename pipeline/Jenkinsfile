@@ -102,7 +102,7 @@ pipeline {
             echo 'Build and deployment of sample go application has completed'
         }
         success {
-            echo 'Build  successful'
+            echo 'Build was successful'
         }
         failure {
             echo 'Build has failed'
