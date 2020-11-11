@@ -4,7 +4,7 @@ metadata:
   annotations:
     description: sample app build config setup
   name: sample-go-app-builds
-message: "Use the following template to create buildconfig and imageStream for builds triggered from cicd namespace "
+message: "Use the following template to create buildconfig and imageStream for builds triggered from cicd namespaces "
 objects:
 - apiVersion: v1
   kind: BuildConfig
