@@ -108,7 +108,7 @@ pipeline {
             echo 'Build has failed'
         }
         unstable {
-            echo 'There was some issue with the build, please verify the logs'
+            echo 'There was some issue with the build check the logs'
         }
         changed {
             echo 'Commit message has proven to pass this build'
