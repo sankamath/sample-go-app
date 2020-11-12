@@ -21,6 +21,7 @@ pipeline {
                         DEV_NAMESPACE = 'dev'
                         IMAGE_NAME = 'sample-go-app'
                         JENKINS_SA = 'jenkins'
+                        IMAGE_REGISTRY = 'image-registry.openshift-image-registry.svc:5000'
                         JENKINS_SA_TOKEN = sh(returnStdout: true, script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token').trim()
                 
                     }
@@ -85,9 +86,7 @@ pipeline {
             steps {
                 script {
                     openshift.withCluster() {
-                                openshift.withProject(BUILD_NAMESPACE) {
-                                    openshift.tag("${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                                }
+                                openshift.tag("${env.IMAGE_REGISTRY}/${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.IMAGE_REGISTRY}/${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
                             }
                     }//script
                 } // steps
