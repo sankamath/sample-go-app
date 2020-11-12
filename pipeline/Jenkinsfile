@@ -43,32 +43,32 @@ pipeline {
                             }
                         }
         
-        // stage('Create Image Builder') {
-        //     when {
-        //         expression {
-        //             openshift.withCluster() {
-        //             openshift.withProject(BUILD_NAMESPACE) {
-        //                 return !openshift.selector("bc", "${BUILD_NAME}").exists();
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     steps {
-        //         script {
-        //             openshift.withCluster() {
-        //                 openshift.withProject(BUILD_NAMESPACE) {
-        //                     openshift.newApp("./pipeline/cicd-template.yaml")
-        //                 }
-        //             }
-        //         }//script
-        //     }//steps
-        // } // stage
+        stage('Create Image Builder') {
+            when {
+                expression {
+                    openshift.withCluster() {
+                    openshift.withProject(BUILD_NAMESPACE) {
+                        return !openshift.selector("bc", "${BUILD_NAME}").exists();
+                        }
+                    }
+                }
+            }
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(BUILD_NAMESPACE) {
+                            openshift.newApp("./pipeline/cicd-template.yaml")
+                        }
+                    }
+                }//script
+            }//steps
+        } // stage
 
         stage('Build Application Docker Image') {
             steps {
                 script {
                         openshift.withCluster() {
-                        openshift.withProject(env.CI_NAMESPACE) {
+                        openshift.withProject(env.BUILD_NAMESPACE) {
                         def bc = openshift.selector('bc', BUILD_NAME).object()
                         print bc.spec.output.to.name
                         bc.spec.output.to.name = BUILD_NAME + ':' + RELEASE + "-" + GIT_COMMIT + "-" + BUILD_NUMBER

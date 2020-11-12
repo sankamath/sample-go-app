@@ -20,7 +20,7 @@ objects:
       - annotations: null
         from:
           kind: DockerImage
-          name: sample-go-app:latest
+          name: image-registry.openshift-image-registry.svc:5000/build/sample-go-app
         generation: 3
         importPolicy: {}
         name: latest
@@ -29,24 +29,17 @@ objects:
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    name: "sample-go-app" 
+    name: sample-go-app
+    namespace: build
   spec:
-    runPolicy: "Serial" 
-    triggers: 
-      - type: "GitHub"
-        github:
-          secret: "github"
-      - type: "Generic"
-        generic:
-    source: 
-      git:
-        ref: develop
-        uri: "https://github.com/sankamath/sample-go-app"
-    strategy: 
-      strategy:
-        dockerStrategy:
-          dockerfilePath: base/Dockerfile
-    output: 
+    source:
+      type: Binary
+    strategy:
+      type: Docker
+      dockerStrategy:
+        noCache: true
+    output:
       to:
-        kind: "ImageStreamTag"
-        name: "sample-go-app:v1"
+        kind: ImageStreamTag
+        name: 'image-registry.openshift-image-registry.svc:5000/build/sample-go-app-build'
+
