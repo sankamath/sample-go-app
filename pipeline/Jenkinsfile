@@ -83,12 +83,14 @@ pipeline {
         }//stage
         stage('Scan and tag develop') {
          steps {
-            script {
-            openshift.tag("${env.CI_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                } //script
+             openshift.withCluster() {
+                        openshift.withProject(BUILD_NAMESPACE) {
+                            openshift.tag("${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                        }
+                    }
             } // steps
          }//stage
-        stage('deploy to ST') {
+        stage('deploy to DEV') {
          steps {
             sh '''#!/bin/bash
             kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
