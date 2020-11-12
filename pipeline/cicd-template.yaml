@@ -7,37 +7,7 @@ metadata:
 message: "Use the following template to create buildconfig and imageStream for builds triggered from cicd namespaces "
 objects:
 - apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      build: sample-go-app
-    name: sample-go-app
-    namespace: build
-  spec:
-      failedBuildsHistroyLimit: 5
-      ndoeSelector: null
-      output:
-        to:
-          kind: ImageStreamTag
-          name: sample-go-app:v1
-      postcommit: {}
-      resource: {}
-      runPolicy: Serial
-      source:
-        binary: {}
-        type: Binary
-      strategy:
-        dockerStrategy: {}
-        type: Docker
-    triggers:
-      - github:
-          secret: 
-          type: Github
-      - generic:
-          secret: 
-          type: Generic
-- apiVersion: v1
-  kind: imageStream
+  kind: ImageStream
   metadata:
     labels:
       build: sample-go-app
@@ -56,4 +26,27 @@ objects:
         name: latest
         referencePolicy:
           type: Source
-
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: "sample-go-app" 
+  spec:
+    runPolicy: "Serial" 
+    triggers: 
+      - type: "GitHub"
+        github:
+          secret: "github"
+      - type: "Generic"
+        generic:
+    source: 
+      git:
+        ref: develop
+        uri: "https://github.com/sankamath/sample-go-app"
+    strategy: 
+      strategy:
+        dockerStrategy:
+          dockerfilePath: base/Dockerfile
+    output: 
+      to:
+        kind: "ImageStreamTag"
+        name: "sample-go-app:v1"
