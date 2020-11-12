@@ -25,6 +25,9 @@ objects:
       runPolicy: Serial
       source:
         binary: {}
+        type: Binary
+      strategy:
+        dockerStrategy: {}
         type: Docker
     triggers:
       - github:
