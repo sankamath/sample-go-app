@@ -82,13 +82,15 @@ pipeline {
             }//steps
         }//stage
         stage('Scan and tag develop') {
-         steps {
-             openshift.withCluster() {
-                        openshift.withProject(BUILD_NAMESPACE) {
-                            openshift.tag("${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                        }
-                    }
-            } // steps
+            steps {
+                script {
+                    openshift.withCluster() {
+                                openshift.withProject(BUILD_NAMESPACE) {
+                                    openshift.tag("${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                                }
+                            }
+                    }//script
+                } // steps
          }//stage
         stage('deploy to DEV') {
          steps {
