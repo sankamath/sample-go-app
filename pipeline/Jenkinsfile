@@ -2,7 +2,7 @@ pipeline {
     agent {
       node {
         // spin up a cat custom slave pod to run this build on
-       label 'maven'
+       label 'kustomize'
       }
     }
     /* options {
