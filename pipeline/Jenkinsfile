@@ -99,12 +99,11 @@ pipeline {
                 sh '''#!/bin/bash
                 echo "path variable is "
                 echo $PATH
-                echo "content of the opt dir"
-                ls -ltr /opt
+                
 
                 cd overlays/dev/
-                /opt/kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
-                /opt/kustomize build | /opt/oc apply -f- -n dev
+                kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
+                kustomize build | oc apply -f- -n dev
                 '''
                 } // steps
          }//stage
