@@ -20,7 +20,7 @@ objects:
       - annotations: null
         from:
           kind: DockerImage
-          name: image-registry.openshift-image-registry.svc:5000/build/sample-go-app
+          name: image-registry.openshift-image-registry.svc:5000/build/sample-go-app:latest
         generation: 3
         importPolicy: {}
         name: latest
@@ -41,5 +41,5 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: 'image-registry.openshift-image-registry.svc:5000/build/sample-go-app-build'
+        name: 'image-registry.openshift-image-registry.svc:5000/build/sample-go-app:latest'
 

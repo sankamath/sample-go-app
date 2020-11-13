@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     openshift.withCluster() {
-                                openshift.tag("${env.IMAGE_REGISTRY}/${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}-build:${env.IMAGE_TAG}", "${env.IMAGE_REGISTRY}/${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                                openshift.tag("${env.IMAGE_REGISTRY}/${env.BUILD_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}", "${env.IMAGE_REGISTRY}/${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}")
                             }
                     }//script
                 } // steps
