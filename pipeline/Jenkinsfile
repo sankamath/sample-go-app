@@ -36,7 +36,7 @@ pipeline {
                                             //shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
                                             
                                             echo "Using project: ${openshift.project()}"
-                                            echo "currently running from " + GIT_BRANCH +  " branch"
+                                            //echo "currently running from " + GIT_BRANCH +  " branch"
                                             echo "jenkins build number is ${BUILD_NUMBER}"
                                         }
                                     }
