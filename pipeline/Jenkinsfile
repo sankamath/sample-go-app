@@ -2,7 +2,7 @@ pipeline {
     agent {
       node {
         // spin up a cat custom slave pod to run this build on
-       label 'kustomize'
+       label 'maven'
       }
     }
     /* options {
@@ -92,12 +92,15 @@ pipeline {
                 } // steps
          }//stage
         stage('deploy to DEV') {
-         steps {
-            sh '''#!/bin/bash
-            kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
-              kustomize build | oc apply -f- -n dev
-            '''
-            } // steps
+            agent {
+                  label 'kustomize'
+                }
+            steps {
+                sh '''#!/bin/bash
+                kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
+                kustomize build | oc apply -f- -n dev
+                '''
+                } // steps
          }//stage
     }//stages
     post {
