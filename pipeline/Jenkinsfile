@@ -97,8 +97,12 @@ pipeline {
                 }
             steps {
                 sh '''#!/bin/bash
-                kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
-                kustomize build | oc apply -f- -n dev
+                echo "path variable is "
+                echo $PATH
+                ls -ltr /usr/local/bin
+
+                /usr/local/bin/kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
+                /usr/local/bin/kustomize build | oc apply -f- -n dev
                 '''
                 } // steps
          }//stage
