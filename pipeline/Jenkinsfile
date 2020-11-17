@@ -99,7 +99,12 @@ pipeline {
                 sh '''#!/bin/bash
                 echo "path variable is "
                 echo $PATH
-                
+
+                echo "listing the content of dir /usr/local/bin"
+                ls -ltr /usr/local/bin
+
+                echo "kustomize version is"
+                kustomize version
 
                 cd overlays/dev/
                 kustomize edit set image image=${env.DEV_NAMESPACE}/${env.IMAGE_NAME}:${env.IMAGE_TAG}
