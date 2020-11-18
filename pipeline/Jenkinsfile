@@ -103,6 +103,9 @@ pipeline {
                 echo "listing the content of dir /usr/local/bin"
                 ls -ltr /usr/local/bin
 
+                echo "listing the content of dir /opt/app"
+                ls -ltr /opt/app
+
                 echo "kustomize version is"
                 kustomize version
 
