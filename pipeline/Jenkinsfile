@@ -130,7 +130,7 @@ pipeline {
             echo 'There was some issue with the build check the logs'
         }
         changed {
-            echo 'Commit message has proven to pass this build'
+            echo 'Commit message has proven to pass this builds'
 
         }
     }
